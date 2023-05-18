@@ -1,0 +1,41 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+
+local function OnEquipped(item)
+    print("Equipped:", item.Name)
+    
+    if item.Name == "Wallet" then
+        -- Define the macro keybinds
+        local macroKeys = {Enum.KeyCode.I, Enum.KeyCode.O}
+        
+        local function ExecuteMacro()
+            for _, key in ipairs(macroKeys) do
+                UserInputService:SetKeyDown(key)
+                wait(0.1)  -- Adjust the delay between key presses if needed
+                UserInputService:SetKeyUp(key)
+            end
+        end
+        
+        while item:IsDescendantOf(Players.LocalPlayer.Character) do
+            ExecuteMacro()
+            wait(1)  -- Adjust the delay between macro executions if needed
+        end
+    end
+end
+
+local function ListenForEquips(player)
+    player.Backpack.ChildAdded:Connect(function(item)
+        OnEquipped(item)
+    end)
+end
+
+local function ApplyEquipsListener()
+    for _, player in ipairs(Players:GetPlayers()) do
+        ListenForEquips(player)
+    end
+    Players.PlayerAdded:Connect(function(player)
+        ListenForEquips(player)
+    end)
+end
+
+ApplyEquipsListener()
